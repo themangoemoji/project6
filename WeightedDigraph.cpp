@@ -8,6 +8,7 @@
 #include "WeightedDigraph.h"
 
 #include <iostream>
+#include <vector>
 #include <fstream>
 #include <sstream>
 #include <limits>
@@ -31,14 +32,36 @@ WeightedDigraph::WeightedDigraph(const string& filename) : numVertices(0), numAr
 	vertexStream >> numVertices;
 	
 	// TODO : You can initialize your data structure here.
-	
-	while(getline(in,line)) {
-		istringstream iss(line);
-		int u, v;
-		float weight;
-		iss >> u >> v >> weight;
-		InsertArc(u, v, weight);
-	}
+
+  // Data structures for constructing bool matrix
+
+  // Iterate through length of list, insert "false" into vector of bools
+  // that signal whether or not path is visited
+  for (auto itr = 0; itr != numVertices; itr++)
+  {
+    boolVec.push_back(0);
+  }
+
+  // Iterate through length and insert "false" lists into matrix
+  for (auto itr = 0; itr != numVertices; itr++)
+  {
+    boolMatrix.push_back(boolVec);
+  }
+
+  // Push back an empty iterator to our adjList so that we can index positions with vectors
+  for (auto itr = 0; itr != numVertices; itr++)
+  {
+    nodeIters.push_back(blankIter);
+  }
+
+  while(getline(in,line)) {
+    istringstream iss(line);
+    int u, v;
+    float weight;
+    iss >> u >> v >> weight;
+    InsertArc(u, v, weight);
+  }
+  adjList.push_back();
 }
 
 /**
@@ -46,8 +69,8 @@ WeightedDigraph::WeightedDigraph(const string& filename) : numVertices(0), numAr
  * You can do any needed cleanup here.
  */
 WeightedDigraph::~WeightedDigraph() {
-	// Intentionally left empty
-	// You may do any needed cleanup here
+  // Intentionally left empty
+  // You may do any needed cleanup here
 }
 
 /**
@@ -56,15 +79,25 @@ WeightedDigraph::~WeightedDigraph() {
  * so the digraph is immutable once created.
  */
 void WeightedDigraph::InsertArc(int from, int to, double weight) {
-	// TODO
+  boolMatrix[from][to] = 1;      
+  cout << "From the bool Matrix: " << boolMatrix[from][to] << endl;
+  //DEBUG 
+  for (auto elem : boolMatrix)
+  {
+    for (auto thing : elem)
+      cout << thing << ' ';
+    cout << endl;
+  }
+  numArcs++;
+  // TODO
 }
 
 /**
  * Finds the number of arcs leading out of the given vertex
  */
 int WeightedDigraph::GetOutDegree(int vertex) const { 
-	// TODO
-	return 0;
+  // TODO
+  return 0;
 }
 
 /**
@@ -72,8 +105,8 @@ int WeightedDigraph::GetOutDegree(int vertex) const {
  * Returns infinity if there is no such arc
  */
 double WeightedDigraph::GetArcWeight(int from, int to) const {
-	// TODO
-	return numeric_limits<double>::infinity();
+  // TODO
+  return numeric_limits<double>::infinity();
 }
 
 /**
@@ -81,32 +114,33 @@ double WeightedDigraph::GetArcWeight(int from, int to) const {
  * Returns infinity if the path is broken.
  */
 double WeightedDigraph::GetPathWeight(const list<int> & path) const {
-	// TODO
-	return numeric_limits<double>::infinity();;
+  // TODO
+  return numeric_limits<double>::infinity();;
 }
 
 /**
  * Checks whether an arc exists between two vertices.
  */
 bool WeightedDigraph::AreConnected(int from, int to) const {
-	// TODO
-	return false;
+  // TODO
+  return false;
 }
 
 /**
  * Determines whether a path between the two vertices exists.
  */
 bool WeightedDigraph::DoesPathExist(int from, int to) const {
-	// TODO
-	return false;
+  if (boolMatrix[from][to]) 
+    return true;
+  return false;
 }
 
 /**
  * Checks whether the given path goes over existing arcs.
  */
 bool WeightedDigraph::IsPathValid(const list<int> & path) const {
-	// TODO
-	return false;
+  // TODO
+  return false;
 }
 
 /**
@@ -115,6 +149,6 @@ bool WeightedDigraph::IsPathValid(const list<int> & path) const {
  * (you may assume that such a path does exist).
  */
 list<int> WeightedDigraph::FindMinimumWeightedPath(int from, int to) const {
-	// TODO
-	return list<int>();
+  // TODO
+  return list<int>();
 }

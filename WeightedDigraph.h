@@ -11,6 +11,7 @@
 #define WeightedDigraph_H
 
 #include<list>
+#include<vector>
 #include<string>
 
 class WeightedDigraph {
@@ -39,6 +40,11 @@ private:
 	int numVertices;
 	int numArcs;
 	// Put member data here
+  std::vector<std::list<int> > adjList;
+  std::vector<std::vector<bool> > boolMatrix;
+  std::vector<bool> boolVec; 
+  std::vector<std::list<int>::const_iterator> nodeIters;
+  list<int>::const_iterator blankIter;
 	
 	void InsertArc(int from, int to, double weight);
 };
