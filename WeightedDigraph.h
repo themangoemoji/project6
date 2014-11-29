@@ -44,7 +44,7 @@ private:
   std::vector<std::vector<bool> > boolMatrix;
   std::vector<bool> boolVec; 
   std::vector<std::list<int>::const_iterator> nodeIters;
-  list<int>::const_iterator blankIter;
+  std::list<int>::const_iterator blankIter;
 	
 	void InsertArc(int from, int to, double weight);
 };
