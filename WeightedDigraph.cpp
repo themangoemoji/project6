@@ -112,7 +112,12 @@ int WeightedDigraph::GetOutDegree(int vertex) const {
  * Returns infinity if there is no such arc
  */
 double WeightedDigraph::GetArcWeight(int from, int to) const {
-  // TODO
+  // TODO fix. ugh
+  /*
+  std::unordered_map<int, double> fromPaths = pathMaps[from];
+  std::pair<int, double> toPath = fromPaths(to); //how do I index a map?
+  double arcWeight = toPath.second();
+  */
   return numeric_limits<double>::infinity();
 }
 
@@ -122,6 +127,11 @@ double WeightedDigraph::GetArcWeight(int from, int to) const {
  */
 double WeightedDigraph::GetPathWeight(const list<int> & path) const {
   // TODO
+  double cumWeight = 0;
+  for (auto node : path)
+  {
+    cumWeight += path.second();
+  }
   return numeric_limits<double>::infinity();;
 }
 
