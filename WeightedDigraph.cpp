@@ -49,6 +49,11 @@ WeightedDigraph::WeightedDigraph(const string& filename) : numVertices(0), numAr
     boolMatrix.push_back(boolVec);
   }
 
+  // Iterate through length and insert "false" lists into matrix
+  for (auto itr = 0; itr != numVertices; itr++)
+  {
+    pathMap.push_back(emptyMap);
+  }
 
   while(getline(in,line)) {
     istringstream iss(line);
@@ -75,15 +80,17 @@ WeightedDigraph::~WeightedDigraph() {
  */
 void WeightedDigraph::InsertArc(int from, int to, double weight) {
   boolMatrix[from][to] = 1;      
-  cout << "From the bool Matrix: " << boolMatrix[from][to] << endl;
   //DEBUG 
+  cout << "From the bool Matrix: " << boolMatrix[from][to] << endl;
   for (auto elem : boolMatrix)
   {
     for (auto thing : elem)
       cout << thing << ' ';
     cout << endl;
   }
-  
+  std::pair<int, double> weightedPath (to, weight);
+  pathMap[from].insert (weightedPath);
+
   numArcs++;
   // TODO
 }
