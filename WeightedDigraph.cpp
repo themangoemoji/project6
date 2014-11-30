@@ -1,4 +1,4 @@
-/**
+/*
  * A definition of a weighted digraph
  * used for CSE 331 Project 6
  * Written by James Daly
@@ -12,6 +12,7 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <unordered_map>
 
 using namespace std;
 
@@ -48,11 +49,6 @@ WeightedDigraph::WeightedDigraph(const string& filename) : numVertices(0), numAr
     boolMatrix.push_back(boolVec);
   }
 
-  // Push back an empty iterator to our adjList so that we can index positions with vectors
-  for (auto itr = 0; itr != numVertices; itr++)
-  {
-    nodeIters.push_back(itr->begin());
-  }
 
   while(getline(in,line)) {
     istringstream iss(line);
@@ -87,6 +83,7 @@ void WeightedDigraph::InsertArc(int from, int to, double weight) {
       cout << thing << ' ';
     cout << endl;
   }
+  
   numArcs++;
   // TODO
 }
@@ -129,93 +126,6 @@ bool WeightedDigraph::AreConnected(int from, int to) const {
  * Determines whether a path between the two vertices exists.
  */
 bool WeightedDigraph::DoesPathExist(int from, int to) const {
-  // Used to terminate full cycle
-  bool pathFound = false;
-  bool newHeadFound = false;
-  list<int> currentCycle;  
-  list<int> subcycle;  
-  list<int>::iterator currentCycleItr;
-  list<int>::iterator subcycleItr;
-
-  // These are the indecies of the start and end of a path
-  // These will also be used to set the bool values of the matrix
-  int compareEnd = 99999;
-  std::list<int> pathList;  
-
-  if (boolMatrix[from][to]) 
-    return true;
-
-  // If the direct path does not exist, traverse to look for another path
-  else 
-  {
-    while (from != to)
-    {
-      if (! boolMatrix[from][*nodeIters[from]])
-      {
-        // Add the path to the current list, 
-        // set paths to true (indicates they have been traversed)
-        to = *nodeIters[from];
-        if (nodeIters[from] != adjList[from].end())
-          subcycle.push_back(from);
-
-        auto holdStart = *nodeIters[from]; 
-        //std::advance(nodeIters[from], 1);
-        if (nodeIters[from] != adjList[from].end())
-          nodeIters[from]++;
-        from = holdStart;
-        //from = *nodeIters[tempStart];
-        to = *nodeIters[from];
-        compareEnd = from;
-
-        if (compareEnd == to) 
-        {
-          subcycle.push_back(from);     
-        }
-
-      }
-      // There was not a valid path from the start node
-      else
-      {
-        // Increment pointer to next possible start node for next iteration through adjList
-        // Do this only if the next to would not point to the end of the list
-        if(nodeIters[from] != adjList[from].end())
-        {
-          nodeIters[from]++;
-          to = *nodeIters[from];
-
-        }
-        // If the path points to the end of the list,
-        // Increment head nodes (from currentCycle) until 
-        // we find a successful path
-        else
-        {
-          newHeadFound = false;
-          while ( ! newHeadFound)
-          {
-            currentCycleItr++;
-            if (to == from)
-            {
-              //cout << "FIN BETCH" << endl;
-              pathsExhausted = true;
-              from = to;
-              break;
-            }
-            from = *currentCycleItr;
-            if(nodeIters[from] != adjList[from].end())
-            {
-              to = *nodeIters[from];
-              newHeadFound = true;
-            }
-            compareEnd = 999999;
-            to = from; 
-            // Done, bitchz
-          }
-        }
-      }
-    }// of while    
-    if (from == to)
-      return true;
-  }
   return false;
 }
 
