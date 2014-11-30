@@ -97,8 +97,14 @@ void WeightedDigraph::InsertArc(int from, int to, double weight) {
  * Finds the number of arcs leading out of the given vertex
  */
 int WeightedDigraph::GetOutDegree(int vertex) const { 
-  // TODO
-  return 0;
+  int outDegree = 0;
+  vector<bool> vertexPaths = boolMatrix[vertex];
+  for (auto elem : vertexPaths)
+  {
+    if (elem)
+      outDegree++;
+  }
+  return outDegree;
 }
 
 /**
