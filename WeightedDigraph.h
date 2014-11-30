@@ -41,7 +41,7 @@ private:
 	int numVertices;
 	int numArcs;
 	// Put member data here
-  std::vector<std::unordered_map<int, double> > pathMap;
+  std::vector<std::unordered_map<int, double> > pathMaps;
   std::unordered_map<int, double> emptyMap;
   std::vector<std::vector<bool> > boolMatrix;
   std::vector<bool> boolVec; 
