@@ -30,8 +30,6 @@ WeightedDigraph::WeightedDigraph(const string& filename) : numVertices(0), numAr
 	istringstream vertexStream(line);
 	vertexStream >> numVertices;
 	
-	// TODO : You can initialize your data structure here.
-
   // Data structures for constructing bool matrix
 
   // Iterate through length of list, insert "false" into vector of bools
@@ -90,7 +88,6 @@ void WeightedDigraph::InsertArc(int from, int to, double weight) {
   pathMaps[from].insert (weightedPath);
 
   numArcs++;
-  // TODO
 }
 
 /**
@@ -112,13 +109,15 @@ int WeightedDigraph::GetOutDegree(int vertex) const {
  * Returns infinity if there is no such arc
  */
 double WeightedDigraph::GetArcWeight(int from, int to) const {
-  // TODO fix. ugh
-  /*
-  std::unordered_map<int, double> fromPaths = pathMaps[from];
-  std::pair<int, double> toPath = fromPaths(to); //how do I index a map?
-  double arcWeight = toPath.second();
-  */
-  return numeric_limits<double>::infinity();
+  if (boolMatrix[from][to])
+  {
+  auto found = pathMaps[from].find(to);
+  double arcWeight = found->second;
+  return arcWeight;
+  }
+
+  else
+    return numeric_limits<double>::infinity();
 }
 
 /**
@@ -128,9 +127,9 @@ double WeightedDigraph::GetArcWeight(int from, int to) const {
 double WeightedDigraph::GetPathWeight(const list<int> & path) const {
   // TODO
   double cumWeight = 0;
-  for (auto node : path)
+  for (auto elem = path.begin(); elem != path.end(); elem++)
   {
-    cumWeight += path.second();
+    cumWeight += *elem;
   }
   return numeric_limits<double>::infinity();;
 }
@@ -139,8 +138,19 @@ double WeightedDigraph::GetPathWeight(const list<int> & path) const {
  * Checks whether an arc exists between two vertices.
  */
 bool WeightedDigraph::AreConnected(int from, int to) const {
-  // TODO
-  return false;
+  auto found = pathMaps[from].find(to); 
+  if (found != pathMaps[from].end())
+  {
+    return true;
+  }
+
+  else if (from == to)
+  { 
+    return true;
+  }
+
+  else if (pathMaps[from].size() == 0)
+    return false;
 }
 
 /**
@@ -150,52 +160,34 @@ bool WeightedDigraph::DoesPathExist(int from, int to) const {
   int head = from, tail = to;
   bool pathsExhausted = false;
   std::unordered_map<int, double> availablePaths = pathMaps[head];
-  cout << "Entering DPE for " << from << ':' << to << ". Checking boolMatrix for presense. boolMatrix[from][to] = " << boolMatrix[from][to] << "." << endl;
-  if (boolMatrix[from][to])
-  {
-    return true;
-  }
 
+  cout << "Entering DPE for " << from << ':' << to << ". Checking boolMatrix for presense. boolMatrix[from][to] = " << boolMatrix[from][to] << "." << endl;
+
+  // Check whether the two verticies are connected
+  AreConnected(from, to);
+
+  // Otherwise, search for a new start vertex
   else
   {
-    //traverse    
-    while (! pathsExhausted)       
+    cout << "No direct connection, ";
+    // Looking at the available paths from our head (originally 'from')
+    availablePaths = pathMaps[head];
+    for (auto path : availablePaths)
     {
-      cout << "No direct connection, ";
-      // Looking at the available paths from our head (originally 'from')
-      availablePaths = pathMaps[head];
-      if (availablePaths.size() != 0)
-      {
-        // If the 'to' is within the available paths
-        
-        for (auto path : availablePaths)
-        {
-          tail = path.first;
-          cout << "Looking for new at head:tail " << head << ':' << tail << ". ";
-          if (boolMatrix[tail][to])
-            return true;
-        }
-        // otherwise, iterate again, looking through a new list
-        head = tail;
-        for (auto path : pathMaps[head])
-        {
-          cout << "Connection not in availPaths, looking at head:tail " << head << ':' << tail << '.' << endl;
-          tail = path.first;
-          DoesPathExist(head, to);
-        }
-      }
-      // no paths from head, return false
-      else
-      {
-        // Trivial
-        cout << "No paths from " << head << ".";
-        pathsExhausted = true;
-        return false;
-        break;
-      }
+      tail = path.first;
+      cout << "Looking for new at head:tail " << head << ':' << tail << ". ";
+      if (boolMatrix[tail][to])
+        return true;
+    }
+    // otherwise, iterate again, looking through a new list
+    head = tail;
+    for (auto path : pathMaps[head])
+    {
+      cout << "Connection not in availPaths, looking at head:tail " << head << ':' << tail << '.' << endl;
+      tail = path.first;
+      DoesPathExist(head, to);
     }
   }
-  return false;
 }
 
 /**
@@ -203,7 +195,8 @@ bool WeightedDigraph::DoesPathExist(int from, int to) const {
  */
 bool WeightedDigraph::IsPathValid(const list<int> & path) const {
   // TODO
-  return (DoesPathExist(*path.begin(), *path.end()));
+  for (int i = 0; i f)
+  return false;//(DoesPathExist(*path.begin(), *path.end()));
 }
 
 /**
