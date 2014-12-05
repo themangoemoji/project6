@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
       list<int> path = graph.FindMinimumWeightedPath(source, dest);
 
       bool isStart = true;
+      cout << "THE MIN PATH: ";
       for (int v : path) {
         if (!isStart) cout << " -> ";
         cout << v;
