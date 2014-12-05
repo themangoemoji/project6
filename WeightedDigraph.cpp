@@ -85,6 +85,7 @@ void WeightedDigraph::InsertArc(int from, int to, double weight) {
       cout << thing << ' ';
     cout << endl;
   }
+  cout << endl;
   std::pair<int, double> weightedPath (to, weight);
   pathMaps[from].insert (weightedPath);
 
@@ -165,64 +166,62 @@ bool WeightedDigraph::DoesPathExist(int from, int to) const {
   int head = from, tail = to;
   std::unordered_map<int, double> availablePaths = pathMaps[head];
 
-  cout << "Entering DPE for " << from << ':' << to << ". Checking boolMatrix for presense. boolMatrix[from][to] = " << boolMatrix[from][to] << "." << endl;
+  //You can use either DFS or BFS approach
+  int startNode = from;
 
-  // Check whether the two verticies are connected
-  if (AreConnected(from, to))
+  for(auto i = 0; i != numVertices; i++)
   {
-    return true;
+    visited[i] = false;
   }
 
-  else
+  // Queue for list
+  std::list<int> queue;
+
+  // Visit start and add it to queue
+  visited[startNode] = true;
+  queue.push_back(startNode);
+
+  while ( ! queue.empty() )
   {
-    //You can use either DFS or BFS approach
-    int startNode = from;
+    // Dequeue a vertex and print it
+    startNode = queue.front();
+    cout << "The start node is: " << startNode << ". ";
+    queue.pop_front();
 
-    for(auto i = 0; i != numVertices; i++)
+    for(auto iter = pathMaps[startNode].begin(); iter != pathMaps[startNode].end(); ++iter)
     {
-      visited[i] = false;
-    }
-
-    // Queue for list
-    std::list<int> queue;
-
-    // Visit start and add it to queue
-    visited[startNode] = true;
-    queue.push_back(startNode);
-
-    while ( ! queue.empty() )
-    {
-      // Dequeue a vertex and print it
-      startNode = queue.front();
-      cout << "The start node is: " << startNode << ". ";
-      queue.pop_front();
-
-      for(auto iter = pathMaps[startNode].begin(); iter != pathMaps[startNode].end(); ++iter)
+      auto found = pathMaps[from].find(to); 
+      if (found != pathMaps[from].end())
       {
-        cout << "Looking at startNode: " << startNode << ". ";
-        if (AreConnected(startNode, to))
-        {
-          return true;
-        }
-
-        else if(pathMaps[startNode].size() == 0)
-        {
-          return false;
-        }
-
-        else if (! visited[iter->first])
-        {
-          visited[iter->first] = true;
-          queue.push_back(iter->first);
-        }
-        // if the node has already been visited, end the search 
-        else if (visited[iter->first])
-        {
-          return false;
-        }
+        cout << endl << "1" << endl;
+        return true;
       }
+
+      // These are connected, but there is not a valid path
+      else if (from == to)
+      { 
+        cout << endl << "2" << endl;
+        return false;
+      }
+
+      else if (pathMaps[from].size() == 0)
+      {
+        cout << endl << "3" << endl;
+        return false;
+      }
+      else if (! visited[iter->first])
+      {
+        cout << endl << "4" << endl;
+        cout << iter->first << endl;
+        if (iter->first == to)
+          return true;
+        visited[iter->first] = true;
+        queue.push_back(iter->first);
+      }
+      // if the node has already been visited, end the search 
     }
   }
+  return false;
 }
 
 
@@ -242,8 +241,9 @@ bool WeightedDigraph::IsPathValid(const list<int> & path) const {
  */
 list<int> WeightedDigraph::FindMinimumWeightedPath(int from, int to) const {
   vector<int> previous;
+  std::list<int> path;
   vector<double> minDistance;
-  
+
   const double maxWeight = std::numeric_limits<double>::infinity();
   minDistance.clear();
   minDistance.resize(numVertices, maxWeight);
@@ -253,6 +253,12 @@ list<int> WeightedDigraph::FindMinimumWeightedPath(int from, int to) const {
 
   std::set<std::pair<int, double> > vertexQueue;
   vertexQueue.insert(std::make_pair(from, minDistance[from]));
+
+  if (from == to)
+  {
+    path.push_front(from);
+    return path;
+  }
 
   while (! vertexQueue.empty() )
   {
@@ -276,14 +282,15 @@ list<int> WeightedDigraph::FindMinimumWeightedPath(int from, int to) const {
       }
     }
   }
-  std::list<int> path;
   auto vertex = to;
   path.push_front(to);
   bool foundPath = false;
   while (! foundPath)
   {
+    cout << "v, newV: " << vertex;
     vertex = previous[vertex];
     path.push_front(vertex);
+    cout << ", " << vertex << "; ";
     if (vertex == from)
       foundPath = true;
   }
