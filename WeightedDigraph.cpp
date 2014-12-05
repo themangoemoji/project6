@@ -77,15 +77,6 @@ WeightedDigraph::~WeightedDigraph() {
  */
 void WeightedDigraph::InsertArc(int from, int to, double weight) {
   boolMatrix[from][to] = 1;      
-  //DEBUG 
-  cout << "From the bool Matrix: " << boolMatrix[from][to] << endl;
-  for (auto elem : boolMatrix)
-  {
-    for (auto thing : elem)
-      cout << thing << ' ';
-    cout << endl;
-  }
-  cout << endl;
   std::pair<int, double> weightedPath (to, weight);
   pathMaps[from].insert (weightedPath);
 
@@ -127,13 +118,22 @@ double WeightedDigraph::GetArcWeight(int from, int to) const {
  * Returns infinity if the path is broken.
  */
 double WeightedDigraph::GetPathWeight(const list<int> & path) const {
-  // TODO
   double cumWeight = 0;
-  for (auto elem = path.begin(); elem != path.end(); elem++)
+  if (! IsPathValid(path))
+    return numeric_limits<double>::infinity();
+  else
   {
-    cumWeight += *elem;
+    auto elem = path.begin();
+    int prev = *elem;
+    elem++;
+    for (; elem != path.end(); elem++)
+    {
+      double weight = pathMaps[prev].find(*elem)->second; 
+      cumWeight += weight;
+      prev = * elem;
+    }
+    return cumWeight;
   }
-  return numeric_limits<double>::infinity();;
 }
 
 /**
@@ -185,7 +185,6 @@ bool WeightedDigraph::DoesPathExist(int from, int to) const {
   {
     // Dequeue a vertex and print it
     startNode = queue.front();
-    cout << "The start node is: " << startNode << ". ";
     queue.pop_front();
 
     for(auto iter = pathMaps[startNode].begin(); iter != pathMaps[startNode].end(); ++iter)
@@ -211,8 +210,6 @@ bool WeightedDigraph::DoesPathExist(int from, int to) const {
       }
       else if (! visited[iter->first])
       {
-        cout << endl << "4" << endl;
-        cout << iter->first << endl;
         if (iter->first == to)
           return true;
         visited[iter->first] = true;
@@ -230,8 +227,29 @@ bool WeightedDigraph::DoesPathExist(int from, int to) const {
  * Checks whether the given path goes over existing arcs.
  */
 bool WeightedDigraph::IsPathValid(const list<int> & path) const {
-  // TODO
-  return false;//(DoesPathExist(*path.begin(), *path.end()));
+  auto i = path.begin();
+  int prev = *i;
+  i++;
+  for ( ; i != path.end(); i++)
+  {
+    if (pathMaps[*i].size() == 0)
+    {
+      if (*i == *path.end())
+        return true;
+      else
+        return false;
+    }
+    else
+    {
+      auto found = pathMaps[prev].find(*i); 
+      if (found ==  pathMaps[prev].end() )
+      {
+        return false;
+      }
+    }
+    prev = *i;
+  }
+  return true;
 }
 
 /**
@@ -277,8 +295,6 @@ list<int> WeightedDigraph::FindMinimumWeightedPath(int from, int to) const {
         minDistance[v] = distanceThroughU;
         previous[v] = u;
         vertexQueue.insert(std::make_pair(v, minDistance[v]));
-        cout << "u:v -> " << u << ':' << v;
-        cout << endl;
       }
     }
   }
@@ -287,15 +303,10 @@ list<int> WeightedDigraph::FindMinimumWeightedPath(int from, int to) const {
   bool foundPath = false;
   while (! foundPath)
   {
-    cout << "v, newV: " << vertex;
     vertex = previous[vertex];
     path.push_front(vertex);
-    cout << ", " << vertex << "; ";
     if (vertex == from)
       foundPath = true;
   }
-  for (auto elem : previous)
-    cout << elem << ',';
-  cout << endl;
   return path;
 }
